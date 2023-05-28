@@ -25,7 +25,9 @@ const register = async (req, res) => {
   //Response
   res.status(StatusCodes.CREATED).json({ user });
 };
-const login = async (req, res) => {};
+const login = async (req, res) => {
+  res.status(StatusCodes.OK).json({ msg: 'You have successfully logged in' });
+};
 
 const logout = async (req, res) => {};
 

@@ -5,11 +5,12 @@ const CustomErrors = require('../errors');
 const configurePassport = async (passport) => {
   passport.use(
     new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
-      if (!email || !password) throw new CustomErrors.BadRequestError('Email and password cannot be empty');
+      if (!email || !password)
+        return done(null, false); /*throw new CustomErrors.BadRequestError('Email and password cannot be empty');*/
       const user = await Users.findOne({ email });
-      if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
-      if (!(await user.verifyPassword(password)))
-        throw new CustomErrors.UnauthenticatedError('The email and password do not match');
+      if (!user) return done(null, false); /*throw new CustomErrors.NotFoundError('This user does not exist');*/
+      if (!(await user.verifyPassword(password))) return done(null, false);
+      // throw new CustomErrors.UnauthenticatedError('The email and password do not match');
       done(null, user);
     })
   );

@@ -29,6 +29,9 @@ const login = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: 'You have successfully logged in' });
 };
 
-const logout = async (req, res) => {};
+const logout = async (req, res) => {
+  req.logOut((error) => error && console.log(error));
+  res.redirect('/');
+};
 
 module.exports = { register, login, logout };

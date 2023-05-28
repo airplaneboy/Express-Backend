@@ -16,9 +16,8 @@ const configurePassport = async (passport) => {
 
   passport.serializeUser((user, done) => done(null, user._id));
   passport.deserializeUser(async (id, done) => {
-    await Users.findById(id, (error, user) => {
-      done(error, user);
-    });
+    const user = await Users.findById(id);
+    done(null, user);
   });
 };
 

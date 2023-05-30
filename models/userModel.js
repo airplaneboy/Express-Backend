@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, 'Input a valid password'],
-      maxlength: 30,
+      maxlength: 300,
     },
     profile: {
       firstName: String,

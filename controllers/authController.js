@@ -26,6 +26,12 @@ const register = async (req, res) => {
   res.status(StatusCodes.CREATED).json({ user });
 };
 const login = async (req, res) => {
+  // req.login(user, (error) => {
+  //   if (error) return next(error);
+
+  //   return res.status(200).json({ msg: 'You have successfully logged in ' });
+  // });
+
   res.status(StatusCodes.OK).json({ msg: 'You have successfully logged in' });
 };
 

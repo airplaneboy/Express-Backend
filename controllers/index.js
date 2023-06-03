@@ -1,5 +1,14 @@
-const { register, login, logout, requireAuth } = require('./authController');
-const { getUser, findUser, updateUser, updatePassword, deleteUser } = require('./userController');
+const { register, login, logout } = require('./authController');
+const {
+  getUser,
+  findUser,
+  updateUser,
+  updatePassword,
+  deleteUser,
+  userProfile,
+  updateUserProfile,
+  findProfile,
+} = require('./userController');
 const { getAllUsers } = require('./adminController');
 
 module.exports = {
@@ -12,4 +21,7 @@ module.exports = {
   updateUser,
   updatePassword,
   deleteUser,
+  userProfile,
+  updateUserProfile,
+  findProfile,
 };

@@ -1,5 +1,5 @@
 const CustomErrors = require('../errors');
-const Users = require('../models/userModel');
+const User = require('../models/User');
 const { StatusCodes } = require('http-status-codes');
 const { createJwtCookies } = require('../utils/jwt');
 
@@ -11,10 +11,10 @@ const register = async (req, res) => {
     throw new CustomErrors.BadRequestError('Fill in all credential');
 
   //Check if user already exists
-  if (await Users.findOne({ email })) throw new CustomErrors.BadRequestError('This user already exist');
+  if (await User.findOne({ email })) throw new CustomErrors.BadRequestError('This user already exist');
 
   //Create User
-  const user = await Users.create({ email, password, username, profile: { firstName, lastName }, role });
+  const user = await User.create({ email, password, username, profile: { firstName, lastName }, role });
   const payload = {
     username: user.username,
     firstName: user.profile.firstName,

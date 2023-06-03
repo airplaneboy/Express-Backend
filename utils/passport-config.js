@@ -1,11 +1,13 @@
 const LocalStrategy = require('passport-local').Strategy;
-const Users = require('../models/userModel');
+const Users = require('../models/User');
 
-var JwtStrategy = require('passport-jwt').Strategy,
+const JwtStrategy = require('passport-jwt').Strategy,
   ExtractJwt = require('passport-jwt').ExtractJwt;
-var opts = {};
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = process.env.JWT_SECRET;
+
+const opts = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET,
+};
 
 const configurePassport = async (passport) => {
   //Local Strategy
@@ -28,7 +30,6 @@ const configurePassport = async (passport) => {
   });
 
   //JWT Strategy
-
   passport.use(
     new JwtStrategy(opts, async (jwt_payload, done) => {
       const user = await Users.findOne({ id: jwt_payload.sub });

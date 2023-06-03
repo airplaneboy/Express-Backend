@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const bcryptJS = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const UserSchema = new mongoose.Schema(
   {
     //Primary
@@ -9,6 +8,7 @@ const UserSchema = new mongoose.Schema(
       required: [true, 'Input a username'],
       unique: true,
       minlength: [3, 'Username is too short'],
+      trim: true,
     },
     email: {
       type: String,
@@ -16,16 +16,18 @@ const UserSchema = new mongoose.Schema(
       unique: true,
       maxlength: [254, 'Email is too long'],
       verified: Boolean,
+      trim: true,
     },
     password: {
       type: String,
       required: [true, 'Input a valid password'],
       maxlength: 300,
+      trim: true,
     },
     profile: {
-      firstName: String,
-      lastName: String,
-      pictureUrl: String,
+      firstName: { type: String, trim: true },
+      lastName: { type: String, trim: true },
+      pictureUrl: String, //why not use buffer?
       bio: String,
       country: String,
       language: String,
@@ -119,4 +121,4 @@ UserSchema.methods.verifyPassword = async function (password) {
   return await bcryptJS.compare(password, this.password);
 };
 
-module.exports = mongoose.model('Users', UserSchema);
+module.exports = mongoose.model('User', UserSchema);

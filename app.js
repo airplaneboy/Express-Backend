@@ -12,7 +12,7 @@ const { notFound, errorHandler } = require('./middlewares');
 const requireAuth = require('./utils/requireAuth');
 
 //Import Routes
-const { authRouter, userRouter, adminRouter } = require('./routes/routes');
+const { authRouter, userRouter, adminRouter, courseRouter } = require('./routes/routes');
 
 //Use Middlewares
 app.use(express.json());
@@ -34,6 +34,7 @@ configurePassport(passport);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/user', requireAuth, userRouter);
+app.use('/api/v1/courses', courseRouter);
 
 app.use(notFound);
 app.use(errorHandler);

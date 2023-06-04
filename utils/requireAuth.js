@@ -5,6 +5,7 @@ const requireAuth = (req, res, next) => {
     return next();
   }
   res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Login is required' });
+  next();
 };
 
 module.exports = requireAuth;

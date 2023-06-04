@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+
 const {
   getUser,
   findUser,
@@ -9,7 +10,7 @@ const {
   userProfile,
   updateUserProfile,
   findProfile,
-} = require('../controllers/');
+} = require('../controllers/userController');
 
 router.route('/me').get(getUser).patch(updateUser).delete(deleteUser);
 router.route('/me/password').patch(updatePassword);

@@ -1,7 +1,7 @@
 const CustomErrors = require('../errors');
 const { StatusCodes } = require('http-status-codes');
 const Users = require('../models/User');
-const _ = require('lodash');
+const { merge } = require('lodash');
 
 const getUser = async (req, res) => {
   const user = await Users.findById(req.user.id).select('-password');
@@ -29,7 +29,7 @@ const updateUser = async (req, res) => {
   let user = await Users.findById(req.user.id).select(['-password', '-profile']);
   if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
   delete req.body.password && delete req.body.profile && delete req.body.role;
-  user = _.merge(user, req.body);
+  user = merge(user, req.body);
   await user.save();
   res.status(200).json({ user });
 };

@@ -19,12 +19,12 @@ const getCourse = async (req, res) => {
 };
 
 const createCourse = async (req, res) => {
-  const { title, description, tags, instructor, lessons, duration } = req.body;
+  const { title, description, instructor } = req.body;
 
   if (!title || !description || !instructor)
     throw new CustomErrors.BadRequestError('Course needs title, description, and instructor');
 
-  const course = await Course.create({ title, description, instructor, tags, lessons, duration });
+  const course = await Course.create(req.body);
   res.status(StatusCodes.CREATED).json(course);
 };
 
@@ -43,6 +43,14 @@ const deleteCourse = async (req, res) => {
   if (!id) throw new CustomErrors.BadRequestError(`No course with ID: ${id}`);
   await Course.findByIdAndDelete(id);
   res.status(StatusCodes.OK).json({ msg: 'Course was successfully deleted' });
+};
+
+//TODO: Make final decision on this
+const getLessonsByCourse = async (req, res) => {
+  const id = req.params.id;
+  const lessons = await Course.findById(id).select('lessons').populate('lessons');
+  if (!lessons) throw new CustomErrors.NotFoundError(`No course with ID: ${id}`);
+  res.status(StatusCodes.OK).json(lessons);
 };
 
 module.exports = { createCourse, getAllCourses, getCourse, updateCourse, deleteCourse };

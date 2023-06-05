@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcryptJS = require('bcryptjs');
+const validator = require('validator');
 const UserSchema = new mongoose.Schema(
   {
     //Primary
@@ -17,12 +18,33 @@ const UserSchema = new mongoose.Schema(
       maxlength: [254, 'Email is too long'],
       verified: Boolean,
       trim: true,
+      validate: {
+        validator: (value) => {
+          return validator.isEmail(value);
+        },
+        message: 'Invalid email address',
+      },
     },
     password: {
       type: String,
       required: [true, 'Input a valid password'],
       maxlength: 300,
       trim: true,
+      //   //TODO: comment out before prod
+      // validate: {
+      //   validator: (value) => {
+      //     const options = {
+      //       minLength: 8,
+      //       minLowercase: 1,
+      //       minUppercase: 1,
+      //       minNumbers: 1,
+      //       minSymbols: 1,
+      //     };
+
+      //     return validator.isStrongPassword(value, options);
+      //   },
+      //   message: 'Password does not meet the strength requirements',
+      // },
     },
     profile: {
       firstName: { type: String, trim: true },
@@ -58,22 +80,18 @@ const UserSchema = new mongoose.Schema(
     },
 
     //Additional
-    progress: {
-      completedLessons: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Lesson' }],
-      currentLesson: { type: mongoose.Schema.Types.ObjectId, ref: 'Lesson' },
-    },
-    enrolledCourses: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: 'Courses',
-    },
-    completedCourses: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: 'Courses',
-    },
-    bookmark: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: 'Courses',
-    },
+    completedLessons: { type: [mongoose.Schema.Types.ObjectId], ref: 'Lesson' },
+
+    currentLesson: { type: mongoose.Schema.Types.ObjectId, ref: 'Lesson' },
+
+    enrolledCourses: { type: [mongoose.Schema.Types.ObjectId], ref: 'Courses' },
+
+    completedCourses: { type: [mongoose.Schema.Types.ObjectId], ref: 'Courses' },
+
+    bookmark: { type: [mongoose.Schema.Types.ObjectId], ref: 'Courses' },
+
+    achievements: { type: [mongoose.Schema.Types.ObjectId], ref: 'Achievement' },
+
     comments: [
       {
         text: { type: String, required: true },
@@ -86,6 +104,7 @@ const UserSchema = new mongoose.Schema(
         // Add any other relevant fields like author, replies, etc.
       },
     ],
+
     notifications: [
       {
         type: { type: String, required: true },
@@ -99,15 +118,6 @@ const UserSchema = new mongoose.Schema(
         // other relevant fields like sender, link, etc.
       },
     ],
-    // settings: {
-    //   language: { type: String, default: 'en' },
-    //   emailNotifications: { type: Boolean, default: true },
-    //   username: { type: String, default: this.username },
-    //   hashedPassword: { type: String, default: this.password },
-    //   email: { type: String, default: this.email },
-    //   profilePicture: { type: String },
-    //   bio: { type: String },
-    // },
   },
   { timestamps: true }
 );

@@ -7,8 +7,9 @@ const LessonSchema = new mongoose.Schema(
     videoURL: { type: String },
     duration: String,
     sequence: Number,
+    course: { type: mongoose.Types.ObjectId, required: true, ref: 'Course' },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.Schema('Lesson', LessonSchema);
+module.exports = mongoose.model('Lesson', LessonSchema);

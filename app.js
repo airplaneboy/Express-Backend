@@ -12,7 +12,14 @@ const { notFound, errorHandler } = require('./middlewares');
 const requireAuth = require('./utils/requireAuth');
 
 //Import Routes
-const { authRouter, userRouter, adminRouter, courseRouter } = require('./routes/routes');
+const {
+  authRouter,
+  userRouter,
+  adminRouter,
+  courseRouter,
+  lessonRouter,
+  achievementRouter,
+} = require('./routes/routes');
 
 //Use Middlewares
 app.use(express.json());
@@ -35,6 +42,8 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/user', requireAuth, userRouter);
 app.use('/api/v1/courses', courseRouter);
+app.use('/api/v1/lessons', lessonRouter);
+app.use('/api/v1/achievements', achievementRouter);
 
 app.use(notFound);
 app.use(errorHandler);

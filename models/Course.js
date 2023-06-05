@@ -7,7 +7,7 @@ const CourseSchema = new mongoose.Schema(
     duration: Number,
     tags: [String],
     instructor: { type: String, required: true },
-    lessons: { type: [mongoose.Types.ObjectId] },
+    lessons: { type: [mongoose.Types.ObjectId], ref: 'Lesson' },
   },
   { timestamps: true }
 );

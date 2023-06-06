@@ -24,6 +24,9 @@ const createCourse = async (req, res) => {
   if (!title || !description || !instructor)
     throw new CustomErrors.BadRequestError('Course needs title, description, and instructor');
 
+  if (await Course.findOne({ title }))
+    throw new CustomErrors.BadRequestError('Course with same title already exists. Choose a different title');
+
   const course = await Course.create(req.body);
   res.status(StatusCodes.CREATED).json(course);
 };
@@ -53,4 +56,10 @@ const getLessonsByCourse = async (req, res) => {
   res.status(StatusCodes.OK).json({ nbHits: lessons.length, lessons });
 };
 
-module.exports = { createCourse, getAllCourses, getCourse, updateCourse, deleteCourse };
+module.exports = {
+  createCourse,
+  getAllCourses,
+  getCourse,
+  updateCourse,
+  deleteCourse,
+};

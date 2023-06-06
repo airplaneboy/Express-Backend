@@ -19,6 +19,7 @@ const {
   courseRouter,
   lessonRouter,
   achievementRouter,
+  searchRouter,
 } = require('./routes/routes');
 
 //Use Middlewares
@@ -44,6 +45,7 @@ app.use('/api/v1/user', requireAuth, userRouter);
 app.use('/api/v1/courses', courseRouter);
 app.use('/api/v1/lessons', lessonRouter);
 app.use('/api/v1/achievements', achievementRouter);
+app.use('/api/v1/search', searchRouter);
 
 app.use(notFound);
 app.use(errorHandler);

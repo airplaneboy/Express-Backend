@@ -4,10 +4,14 @@ const { merge } = require('lodash');
 const Lesson = require('../models/Lesson');
 
 const createLesson = async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, courseId } = req.body;
 
-  if (!title || !description)
+  if (!title || !description || !courseId)
     throw new CustomErrors.BadRequestError('Lesson title, description, and courseId is required');
+
+  if (await Lesson.findOne({ title }))
+    throw new CustomErrors.BadRequestError('Lesson with same title already exists. Choose a different title');
+
   const lesson = await Lesson.create(req.body);
   res.status(StatusCodes.CREATED).json(lesson);
 };
@@ -44,8 +48,15 @@ const getAllLessons = async (req, res) => {
 const getLessonsByCourse = async (req, res) => {
   const courseId = req.params.courseId;
   const lessons = await Lesson.find({ course: courseId });
-  if (!lessons) throw new CustomErrors.NotFoundError(`Lesson with ID: ${lessonId} not found`);
+  if (!lessons) throw new CustomErrors.NotFoundError(`No course with ID: ${courseId}`);
   res.status(StatusCodes.OK).json({ nbHits: lessons.length, lessons });
 };
 
-module.exports = { createLesson, getLesson, updateLesson, deleteLesson, getAllLessons, getLessonsByCourse };
+module.exports = {
+  createLesson,
+  getLesson,
+  updateLesson,
+  deleteLesson,
+  getAllLessons,
+  getLessonsByCourse,
+};

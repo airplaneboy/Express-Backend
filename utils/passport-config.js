@@ -13,19 +13,16 @@ const configurePassport = async (passport) => {
   //Local Strategy
   passport.use(
     new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
-      if (!email || !password)
-        return done(null, false); /*throw new CustomErrors.BadRequestError('Email and password cannot be empty');*/
+      if (!email || !password) return done(null, false);
       const user = await Users.findOne({ email });
-      if (!user) return done(null, false); /*throw new CustomErrors.NotFoundError('This user does not exist');*/
+      if (!user) return done(null, false);
       if (!(await user.verifyPassword(password))) return done(null, false);
-      // throw new CustomErrors.UnauthenticatedError('The email and password do not match');
       done(null, user);
     })
   );
-
   passport.serializeUser((user, done) => done(null, user._id));
-  passport.deserializeUser(async (id, done) => {
-    const user = await Users.findById(id);
+  passport.deserializeUser(async (userId, done) => {
+    const user = await Users.findById(userId);
     done(null, user);
   });
 
@@ -35,7 +32,6 @@ const configurePassport = async (passport) => {
       const user = await Users.findOne({ id: jwt_payload.sub });
       if (!user) return done(null, false);
       // or you could create a new account
-
       if (user) return done(null, user);
     })
   );

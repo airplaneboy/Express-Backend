@@ -65,6 +65,7 @@ const UserSchema = new mongoose.Schema(
       birthday: Date,
     },
     role: {
+      required: true,
       type: String,
       enum: ['student', 'teacher', 'admin'],
       default: 'student',

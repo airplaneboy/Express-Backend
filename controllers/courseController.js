@@ -1,4 +1,5 @@
 const Course = require('../models/Course');
+const User = require('../models/User');
 const CustomErrors = require('../errors');
 const { StatusCodes } = require('http-status-codes');
 const { merge } = require('lodash');
@@ -54,6 +55,13 @@ const getLessonsByCourse = async (req, res) => {
   const lessons = await Course.findById(courseId).select('lessons').populate('lessons');
   if (!lessons) throw new CustomErrors.NotFoundError(`No course with ID: ${courseId}`);
   res.status(StatusCodes.OK).json({ nbHits: lessons.length, lessons });
+};
+
+const getUserCourses = async (req, res) => {
+  const userId = req.params.userId;
+  const courses = await User.findById(userId).select('enrolledCourses');
+  if (!courses) throw new CustomErrors.NotFoundError(`No user with ID: ${userId}`);
+  res.status(Status.OK).json({ nbHits: courses, courses });
 };
 
 module.exports = {

@@ -37,6 +37,11 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.get('/protected', passport.authenticate('jwt', { session: false }), (req, res) => {
+  // If the JWT is valid, the user will be stored in req.user
+  res.send('You have accessed a protected route');
+});
+
 //Use routes
 configurePassport(passport);
 app.use('/api/v1/auth', authRouter);

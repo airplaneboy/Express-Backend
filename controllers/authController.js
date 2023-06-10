@@ -2,23 +2,20 @@ const CustomErrors = require('../errors');
 const User = require('../models/User');
 const RefreshToken = require('../models/RefreshToken');
 const { StatusCodes } = require('http-status-codes');
-const { createJwtAccessAndRefreshCookies, createRefreshAndAccessToken, verifyToken } = require('../utils/jwt');
+const { createRefreshAndAccessToken, verifyToken } = require('../utils/jwt');
 const crypto = require('crypto');
 
 const register = async (req, res) => {
-  const { email, password, firstName, lastName, username, role } = req.body;
+  const { email, password, firstName, lastName, username } = req.body;
 
   if (!email || !password || !firstName || !lastName || !username)
     throw new CustomErrors.BadRequestError('Fill in all credential');
 
   if (await User.findOne({ email })) throw new CustomErrors.BadRequestError('This user already exist');
 
-  const user = await User.create({ email, password, username, profile: { firstName, lastName }, role });
-  const payload = { id: user._id, username: user.username, role: user.role };
+  await User.create({ email, password, username, profile: { firstName, lastName } });
 
-  //TODO: Add a refresh token
-  createJwtAccessAndRefreshCookies({ res, payload });
-  res.status(StatusCodes.CREATED).json({ user });
+  res.status(StatusCodes.CREATED).redirect('/login').json({ msg: 'Successfully created user' });
 };
 
 const login = async (req, res) => {
@@ -36,12 +33,13 @@ const login = async (req, res) => {
       userId: user._id,
       refreshToken: refreshToken,
     });
-    createRefreshAndAccessToken({ res, payload, refreshToken: refreshToken });
+    return createRefreshAndAccessToken({ res, payload, refreshToken: refreshToken });
   }
 
   if (!refreshTokenPayload.isValid) throw new CustomErrors.BadRequestError('Invalid credentials');
 
   refreshTokenPayload.refreshToken = refreshToken;
+  // refreshToken = refreshTokenPayload.refreshToken;
   await refreshTokenPayload.save();
   createRefreshAndAccessToken({ res, payload, refreshToken: refreshToken });
 };
@@ -49,8 +47,9 @@ const login = async (req, res) => {
 const refreshToken = async (req, res) => {
   const { refresh_token: refreshTokenCookies } = req.signedCookies;
 
+  if (!refreshTokenCookies) throw new CustomErrors.BadRequestError('Token is invalid or may have expired');
   const decoded = verifyToken({ token: refreshTokenCookies, secret: process.env.REFRESH_TOKEN_SECRET });
-  if (!decoded) throw new CustomErrors.BadRequestError('Invalid refresh token');
+  if (!decoded) throw new CustomErrors.BadRequestError('Invalid token');
 
   const refreshToken = await RefreshToken.findOne({
     refreshToken: decoded.refreshToken,
@@ -64,11 +63,16 @@ const refreshToken = async (req, res) => {
 };
 
 const logout = async (req, res) => {
+  const token = req.signedCookies.refresh_token;
+  if (token) {
+    const decoded = verifyToken({ token, secret: process.env.REFRESH_TOKEN_SECRET });
+    await RefreshToken.findOneAndDelete({ userId: decoded.payload.userId });
+  }
+
   req.logOut((error) => {
     if (error) throw new CustomErrors.BadRequestError(`There was an error ${error}`);
   });
-  res.cookie('token', '', { expires: new Date(Date.now()), httpOnly: true });
-  res.redirect('/');
+  res.cookie('refresh_token', '', { expires: new Date(Date.now()), httpOnly: true }).json({ msg: 'Logout Successful' });
 };
 
 module.exports = { register, login, logout, refreshToken };

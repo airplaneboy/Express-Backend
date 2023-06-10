@@ -6,7 +6,7 @@ const { register, login, logout, refreshToken } = require('../controllers/authCo
 
 router.post('/register', register);
 router.post('/login', passport.authenticate('local', { failureRedirect: '/error' }), login);
-router.post('/refresh-token', refreshToken);
+router.get('/refresh-token', refreshToken);
 router.delete('/logout', logout);
 
 router.get('/error', (req, res) => {

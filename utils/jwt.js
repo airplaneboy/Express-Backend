@@ -52,18 +52,16 @@ const createRefreshAndAccessToken = ({ res, payload, refreshToken }) => {
     expiresIn: process.env.ACCESS_TOKEN_LIFETIME,
   });
 
-  if (!refreshToken)
-    return res.status(StatusCodes.OK).json({ msg: 'Successfully created access token', accessToken });
+  if (!refreshToken) return res.status(StatusCodes.OK).json({ msg: 'Successfully created access token', accessToken });
 
   const refreshTokenJWT = jwt.sign({ payload, refreshToken }, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: process.env.REFRESH_TOKEN_LIFETIME,
   });
 
-  const thirtyDays = 30 * 86400000;
-
+  // const thirtyDays = 30 * 86400000;
   res.cookie('refresh_token', refreshTokenJWT, {
     httpOnly: true,
-    expires: new Date(Date.now() + thirtyDays),
+    expires: new Date(Date.now() + +process.env.REFRESH_TOKEN_COOKIES_EXPIRATION),
     secure: process.env.NODE_ENV === 'production',
     signed: true,
   });

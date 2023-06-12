@@ -53,7 +53,7 @@ const getUserCourses = async (req, res) => {
   const userId = req.params.userId;
   const courses = await User.findById(userId).select('enrolledCourses');
   if (!courses) throw new CustomErrors.NotFoundError(`No user with ID: ${userId}`);
-  res.status(StatusCodes.OK).json({ nbHits: courses, courses });
+  res.status(StatusCodes.OK).json({ nbHits: courses.length, courses });
 };
 
 module.exports = {

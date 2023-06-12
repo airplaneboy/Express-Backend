@@ -1,15 +1,10 @@
 const CustomErrors = require('../errors');
 const { StatusCodes } = require('http-status-codes');
 const Users = require('../models/User');
+const Course = require('../models/Course');
 const { merge } = require('lodash');
 
 //Current User
-const getAllUsers = async (req, res) => {
-  const user = await Users.find({}).select('-password');
-  if (!user) throw new CustomErrors.BadRequestError('Unable to get users');
-  res.status(StatusCodes.OK).json({ nbHits: user.length, user });
-};
-
 const getCurrentUser = async (req, res) => {
   if (!req.user) throw new CustomErrors.BadRequestError('Login is required');
   const userId = req.user.userId;
@@ -54,6 +49,12 @@ const deleteCurrentUser = async (req, res) => {
 };
 
 //Users
+const getAllUsers = async (req, res) => {
+  const user = await Users.find({}).select('-password');
+  if (!user) throw new CustomErrors.BadRequestError('Unable to get users');
+  res.status(StatusCodes.OK).json({ nbHits: user.length, user });
+};
+
 const getUser = async (req, res) => {
   const userId = req.params.userId;
 
@@ -92,6 +93,23 @@ const deleteUser = async (req, res) => {
   const user = await Users.findByIdAndDelete(req.params.userId);
   if (!user) throw new CustomErrors.NotFoundError('User was not found');
   res.status(StatusCodes.OK).json({ msg: 'User successfully deleted' });
+};
+
+const enrollUserToCourse = async (req, res) => {
+  const userId = req.params.userId;
+  const courseIds = req.body.courseIds;
+
+  const user = await Users.findById(userId);
+  if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
+  // const course = await Course.findById(courseId);
+  const courses = await Course.find({ _id: { $in: courseIds } });
+  if (!courses) throw new CustomErrors.NotFoundError('Invalid courseId(s)');
+
+  // user.enrolledCourses.push(...courseIds);
+  user.enrolledCourses = merge(user.enrolledCourses, courses);
+  await user.save();
+
+  res.status(StatusCodes.OK).json({ msg: 'Successfully enrolled to course' });
 };
 
 //Profiles
@@ -146,4 +164,5 @@ module.exports = {
   getAllProfiles,
   getProfile,
   updateProfile,
+  enrollUserToCourse,
 };

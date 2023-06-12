@@ -34,7 +34,7 @@ const searchUser = async (req, res) => {
 const searchAchievement = async (req, res) => {
   const query = req.query.q;
   if (!query) throw new CustomErrors.BadRequestError(`Invalid search query: ${query}. Use 'q' as the Query Parameter`);
-  const results = await Achievement.find({ title: { $regex: query, $options: 'i' } });
+  const results = await Achievement.find({ name: { $regex: query, $options: 'i' } });
   if (!results) throw new CustomErrors.BadRequestError(`There was an error searching for: ${query}`);
   res.status(StatusCodes.OK).json({ nbHits: results.length, results });
 };

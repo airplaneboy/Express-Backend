@@ -49,19 +49,11 @@ const deleteCourse = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: 'Course was successfully deleted' });
 };
 
-//TODO: Make final decision on this
-const getLessonsByCourse = async (req, res) => {
-  const courseId = req.params.courseId;
-  const lessons = await Course.findById(courseId).select('lessons').populate('lessons');
-  if (!lessons) throw new CustomErrors.NotFoundError(`No course with ID: ${courseId}`);
-  res.status(StatusCodes.OK).json({ nbHits: lessons.length, lessons });
-};
-
 const getUserCourses = async (req, res) => {
   const userId = req.params.userId;
   const courses = await User.findById(userId).select('enrolledCourses');
   if (!courses) throw new CustomErrors.NotFoundError(`No user with ID: ${userId}`);
-  res.status(Status.OK).json({ nbHits: courses, courses });
+  res.status(StatusCodes.OK).json({ nbHits: courses, courses });
 };
 
 module.exports = {
@@ -70,4 +62,5 @@ module.exports = {
   getCourse,
   updateCourse,
   deleteCourse,
+  getUserCourses,
 };

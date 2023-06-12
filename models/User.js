@@ -30,21 +30,21 @@ const UserSchema = new mongoose.Schema(
       required: [true, 'Input a valid password'],
       maxlength: 300,
       trim: true,
-      //   //TODO: comment out before prod
-      // validate: {
-      //   validator: (value) => {
-      //     const options = {
-      //       minLength: 8,
-      //       minLowercase: 1,
-      //       minUppercase: 1,
-      //       minNumbers: 1,
-      //       minSymbols: 1,
-      //     };
+      //TODO: comment out before prod
+      validate: {
+        validator: (value) => {
+          const options = {
+            minLength: 8,
+            minLowercase: 1,
+            minUppercase: 1,
+            minNumbers: 1,
+            minSymbols: 1,
+          };
 
-      //     return validator.isStrongPassword(value, options);
-      //   },
-      //   message: 'Password does not meet the strength requirements',
-      // },
+          return validator.isStrongPassword(value, options);
+        },
+        message: 'Password does not meet the strength requirements',
+      },
     },
     profile: {
       firstName: { type: String, trim: true },

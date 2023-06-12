@@ -21,11 +21,14 @@ const getCurrentUser = async (req, res) => {
 const updateCurrentUser = async (req, res) => {
   if (!req.body) throw new CustomErrors.BadRequestError('No valid values to update');
   if (!req.user) throw new CustomErrors.BadRequestError('Login is needed');
-  let user = await Users.findById(req.user.userId).select(['-password', '-profile']);
+  let user = await Users.findById(req.user.userId).select(['username', 'email']);
   if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
-  delete req.body.password && delete req.body.profile && delete req.body.role;
-  user = merge(user, req.body);
+
+  if (req.body.username) user.username = req.body.username;
+  if (req.body.email) user.email = req.body.email;
+
   await user.save();
+  //TODO: Should I Update cookies here
   res.status(200).json({ user });
 };
 
@@ -46,6 +49,7 @@ const deleteCurrentUser = async (req, res) => {
   if (!req.user) throw new CustomErrors.BadRequestError('Login is needed');
   const user = await Users.findByIdAndDelete(req.user.userId);
   if (!user) throw new CustomErrors.NotFoundError('User was not found');
+  //TODO: Logout user here
   res.status(StatusCodes.OK).json({ msg: 'User successfully deleted' });
 };
 
@@ -63,7 +67,7 @@ const updateUser = async (req, res) => {
   if (!req.user) throw new CustomErrors.BadRequestError('Login is needed');
   let user = await Users.findById(req.params.userId).select(['-password', '-profile']);
   if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
-  delete req.body.password && delete req.body.profile && delete req.body.role;
+  delete req.body.password && delete req.body.profile;
   user = merge(user, req.body);
   await user.save();
   res.status(200).json({ user });
@@ -71,7 +75,8 @@ const updateUser = async (req, res) => {
 
 const updatePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
-  if (!currentPassword || !newPassword) throw new CustomErrors.BadRequestError('Input the new and current passwords');
+  if (!currentPassword || !newPassword)
+    throw new CustomErrors.BadRequestError('Input the new (newPassword) and current (currentPassword) passwords');
   if (!req.user) throw new CustomErrors.BadRequestError('Login is needed');
   const user = await Users.findById(req.params.userId).select('password');
   if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
@@ -106,7 +111,7 @@ const updateCurrentProfile = async (req, res) => {
   if (!req.body) throw new CustomErrors.BadRequestError('No valid values to update');
   let user = await Users.findById(req.user.userId).select('profile');
   if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
-  user.profile = _.merge(user.profile, req.body);
+  user.profile = merge(user.profile, req.body);
   await user.save();
   res.status(200).json({ user, body: req.body });
 };
@@ -121,7 +126,7 @@ const updateProfile = async (req, res) => {
   if (!req.body) throw new CustomErrors.BadRequestError('No valid values to update');
   let user = await Users.findById(req.params.userId).select('profile');
   if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
-  user.profile = _.merge(user.profile, req.body);
+  user.profile = merge(user.profile, req.body);
   await user.save();
   res.status(200).json({ user, body: req.body });
 };

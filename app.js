@@ -36,14 +36,10 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get(
-  '/protected',
-  passport.authenticate('jwt', { session: false, failureRedirect: `${process.env.ROOT_URL}/auth/refresh-token` }),
-  (req, res) => {
-    // If the JWT is valid, the user will be stored in req.user
-    res.json({ msg: 'Accessed protected route', user: req.user });
-  }
-);
+app.get('/protected', passport.authenticate('jwt', { session: false }), (req, res) => {
+  // If the JWT is valid, the user will be stored in req.user
+  res.json({ msg: 'Accessed protected route', user: req.user });
+});
 
 //Use routes
 configurePassport(passport);

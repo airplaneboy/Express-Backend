@@ -21,12 +21,11 @@ const createAchievement = async (req, res) => {
   if (!name || !description || !requirement)
     throw new CustomErrors.BadRequestError('Name, Description, and Requirement field cannot be empty');
 
-  if (await Achievement.findOne({ title }))
+  if (await Achievement.findOne({ name }))
     throw new CustomErrors.BadRequestError('Achievement with same title already exists. Choose a different title');
 
   const achievement = await Achievement.create(req.body);
-  if (!achievement) throw new CustomErrors.NotFoundError(`Achievement with ID: ${achievementId} not found`);
-  res.status(StatusCodes.OK).json(achievement);
+  res.status(StatusCodes.OK).json({ msg: 'Successfully created achievement', achievement });
 };
 
 const updateAchievement = async (req, res) => {

@@ -1,12 +1,14 @@
 const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
 
+//#region create JWT and verify methods
 const createJWT = ({ payload }) => {
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_LIFETIME });
 };
-
 const verifyToken = ({ token, secret }) => jwt.verify(token, secret);
+//#endregion
 
+//#region
 const createJwtAccessAndRefreshCookies = ({ res, payload, refreshToken }) => {
   //Create JWT
   const accessToken = createJWT({ payload: payload });
@@ -46,18 +48,36 @@ const createJwtCookies = ({ res, payload }) => {
     signed: true,
   });
 };
+//#endregion
 
 const createRefreshAndAccessToken = ({ res, payload, refreshToken }) => {
   const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: process.env.ACCESS_TOKEN_LIFETIME,
   });
 
-  if (!refreshToken) return res.status(StatusCodes.OK).json({ msg: 'Successfully created access token', accessToken });
+  if (!refreshToken) {
+    return res
+      .status(StatusCodes.OK)
+      .cookie('access_token', accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        signed: true,
+        maxAge: +process.env.ACCESS_TOKEN_COOKIES_EXPIRATION,
+      })
+      .json({ msg: 'Successfully created access token', accessToken });
+  }
 
   const refreshTokenJWT = jwt.sign({ payload, refreshToken }, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: process.env.REFRESH_TOKEN_LIFETIME,
   });
 
+  //const oneHour = 3600000;
+  res.cookie('access_token', accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    signed: true,
+    maxAge: +process.env.ACCESS_TOKEN_COOKIES_EXPIRATION,
+  });
   // const thirtyDays = 30 * 86400000;
   res.cookie('refresh_token', refreshTokenJWT, {
     httpOnly: true,

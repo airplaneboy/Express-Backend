@@ -5,13 +5,8 @@ const passport = require('passport');
 const { register, login, logout, refreshToken } = require('../controllers/authController');
 
 router.post('/register', register);
-router.post('/login', passport.authenticate('local', { failureRedirect: '/error' }), login);
+router.post('/login', passport.authenticate('local'), login);
 router.get('/refresh-token', refreshToken);
-router.delete('/logout', logout);
-
-router.get('/error', (req, res) => {
-  console.log('Custom error: An error occurred');
-  res.status(400).json({ msg: 'Custom error: An error occurred' });
-});
+router.delete('/logout', passport.authenticate('jwt', { session: false }), logout);
 
 module.exports = router;

@@ -9,7 +9,6 @@ const session = require('express-session');
 const passport = require('passport');
 const configurePassport = require('./utils/passport-config');
 const { notFound, errorHandler } = require('./middlewares');
-const requireAuth = require('./utils/requireAuth');
 
 //Import Routes
 const {
@@ -25,7 +24,7 @@ const {
 //Use Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser(process.env.JWT_SECRET));
+app.use(cookieParser(process.env.ACCESS_TOKEN_SECRET));
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -37,20 +36,24 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/protected', passport.authenticate('jwt', { session: false }), (req, res) => {
-  // If the JWT is valid, the user will be stored in req.user
-  res.send('You have accessed a protected route');
-});
+app.get(
+  '/protected',
+  passport.authenticate('jwt', { session: false, failureRedirect: `${process.env.ROOT_URL}/auth/refresh-token` }),
+  (req, res) => {
+    // If the JWT is valid, the user will be stored in req.user
+    res.json({ msg: 'Accessed protected route', user: req.user });
+  }
+);
 
 //Use routes
 configurePassport(passport);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/admin', adminRouter);
-app.use('/api/v1/user', requireAuth, userRouter);
-app.use('/api/v1/courses', courseRouter);
-app.use('/api/v1/lessons', lessonRouter);
-app.use('/api/v1/achievements', achievementRouter);
-app.use('/api/v1/search', searchRouter);
+app.use('/api/v1/user', passport.authenticate('jwt', { session: false }), userRouter);
+app.use('/api/v1/courses', passport.authenticate('jwt', { session: false }), courseRouter);
+app.use('/api/v1/lessons', passport.authenticate('jwt', { session: false }), lessonRouter);
+app.use('/api/v1/achievements', passport.authenticate('jwt', { session: false }), achievementRouter);
+app.use('/api/v1/search', passport.authenticate('jwt', { session: false }), searchRouter);
 
 app.use(notFound);
 app.use(errorHandler);

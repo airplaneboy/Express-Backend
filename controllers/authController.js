@@ -63,16 +63,22 @@ const refreshToken = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  const token = req.signedCookies.refresh_token;
-  if (token) {
-    const decoded = verifyToken({ token, secret: process.env.REFRESH_TOKEN_SECRET });
-    await RefreshToken.findOneAndDelete({ userId: decoded.payload.userId });
-  }
+  // const token = req.signedCookies.refresh_token;
+  if (!req.user) throw new CustomErrors.BadRequestError('User is invalid. Log in and try again');
+  const userId = req.user.userId;
+  // if (token) {
+  //   const decoded = verifyToken({ token, secret: process.env.REFRESH_TOKEN_SECRET });
+  //   await RefreshToken.findOneAndDelete({ userId: decoded.payload.userId });
+  // }
+  await RefreshToken.findOneAndDelete({ userId });
 
   req.logOut((error) => {
     if (error) throw new CustomErrors.BadRequestError(`There was an error ${error}`);
   });
-  res.cookie('refresh_token', '', { expires: new Date(Date.now()), httpOnly: true }).json({ msg: 'Logout Successful' });
+
+  res.cookie('access_token', '', { expires: new Date(Date.now()), httpOnly: true });
+  res.cookie('refresh_token', '', { expires: new Date(Date.now()), httpOnly: true });
+  res.status(StatusCodes.OK).json({ msg: 'Logout Successful', accessToken: null });
 };
 
 module.exports = { register, login, logout, refreshToken };

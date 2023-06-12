@@ -7,8 +7,13 @@ const {
   updateAchievement,
   deleteAchievement,
 } = require('../controllers/achievementController');
+const { authorizePermissions } = require('../middlewares/authorizePermissions');
 
-router.route('/').get(getAllAchievements).post(createAchievement);
-router.route('/:achievementId').get(getAchievement).patch(updateAchievement).delete(deleteAchievement);
+router.route('/').get(getAllAchievements).post(authorizePermissions('admin'), createAchievement);
+router
+  .route('/:achievementId')
+  .get(getAchievement)
+  .patch(authorizePermissions('admin'), updateAchievement)
+  .delete(authorizePermissions('admin'), deleteAchievement);
 
 module.exports = router;

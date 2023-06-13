@@ -89,7 +89,8 @@ const UserSchema = new mongoose.Schema(
 
     completedCourses: { type: [mongoose.Schema.Types.ObjectId], ref: 'Courses' },
 
-    bookmark: { type: [mongoose.Schema.Types.ObjectId], ref: 'Courses' },
+    //TODO: Should I get rid of?
+    // bookmark: { type: [mongoose.Schema.Types.ObjectId], ref: 'Courses' },
 
     achievements: { type: [mongoose.Schema.Types.ObjectId], ref: 'Achievement' },
 

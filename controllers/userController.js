@@ -80,6 +80,22 @@ const assignAchievementToCurrentUser = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: `Successfully assigned achievement (${achievement.name}) to user` });
 };
 
+const updateCurrentUserCompletedCourses = async (req, res) => {
+  const userId = req.user.userId;
+  const courseId = req.body.courseId;
+
+  const user = await Users.findById(userId);
+  if (!user) throw new CustomErrors.NotFoundError('User was not found');
+
+  const course = await Course.findById(courseId);
+  if (!course) throw new CustomErrors.NotFoundError(`Lesson with ID: ${courseId} was not found`);
+
+  user.completedCourses = merge(user.completedCourses, courseId);
+  await user.save();
+
+  res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed courses' });
+};
+
 const updateCurrentUserCompletedLessons = async (req, res) => {
   const userId = req.user.userId;
   const lessonId = req.body.lessonId;
@@ -191,6 +207,22 @@ const updateUserCompletedLessons = async (req, res) => {
 
   res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed lessons' });
 };
+
+const updateUserCompletedCourses = async (req, res) => {
+  const userId = req.params.userId;
+  const courseId = req.body.courseId;
+
+  const user = await Users.findById(userId);
+  if (!user) throw new CustomErrors.NotFoundError('User was not found');
+
+  const course = await Course.findById(courseId);
+  if (!course) throw new CustomErrors.NotFoundError(`Lesson with ID: ${courseId} was not found`);
+
+  user.completedCourses = merge(user.completedCourses, courseId);
+  await user.save();
+
+  res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed courses' });
+};
 //Profiles
 const getAllProfiles = async (req, res) => {
   const profiles = await Users.find({}).select('profile');
@@ -249,4 +281,6 @@ module.exports = {
   assignAchievementToCurrentUser,
   updateUserCompletedLessons,
   updateCurrentUserCompletedLessons,
+  updateUserCompletedCourses,
+  updateCurrentUserCompletedCourses,
 };

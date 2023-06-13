@@ -1,6 +1,7 @@
 const CustomErrors = require('../errors');
 const { StatusCodes } = require('http-status-codes');
 const Users = require('../models/User');
+const Achievement = require('../models/Achievement');
 const Course = require('../models/Course');
 const { merge } = require('lodash');
 
@@ -60,6 +61,22 @@ const enrollCurrentUserToCourse = async (req, res) => {
   await user.save();
 
   res.status(StatusCodes.OK).json({ msg: 'Successfully enrolled to course' });
+};
+
+const assignAchievementToCurrentUser = async (req, res) => {
+  const userId = req.user.Id;
+  const achievementId = req.body.achievementId;
+
+  const user = await Users.findById(userId);
+  if (!user) throw new CustomErrors.NotFoundError(`User with ID: ${userId} not found`);
+
+  const achievement = Achievement.findById(achievementId);
+  if (!achievement) throw new CustomErrors.NotFoundError(`Achievement with ID: ${achievementId} not found`);
+
+  user.achievements = merge(user.achievements, achievementId);
+  await user.save();
+
+  res.status(StatusCodes.OK).json({ msg: `Successfully assigned achievement (${achievement.name}) to user` });
 };
 
 //Users
@@ -126,6 +143,22 @@ const enrollUserToCourse = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: 'Successfully enrolled to course' });
 };
 
+const assignAchievementToUser = async (req, res) => {
+  const userId = req.params.Id;
+  const achievementId = req.body.achievementId;
+
+  const user = await Users.findById(userId);
+  if (!user) throw new CustomErrors.NotFoundError(`User with ID: ${userId} not found`);
+
+  const achievement = Achievement.findById(achievementId);
+  if (!achievement) throw new CustomErrors.NotFoundError(`Achievement with ID: ${achievementId} not found`);
+
+  user.achievements = merge(user.achievements, achievementId);
+  await user.save();
+
+  res.status(StatusCodes.OK).json({ msg: `Successfully assigned achievement (${achievement.name}) to user` });
+};
+
 //Profiles
 const getAllProfiles = async (req, res) => {
   const profiles = await Users.find({}).select('profile');
@@ -180,4 +213,6 @@ module.exports = {
   updateProfile,
   enrollUserToCourse,
   enrollCurrentUserToCourse,
+  assignAchievementToUser,
+  assignAchievementToCurrentUser,
 };

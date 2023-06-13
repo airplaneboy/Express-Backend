@@ -24,6 +24,7 @@ const {
   updateCurrentUserCompletedLessons,
   updateUserCompletedCourses,
   updateCurrentUserCompletedCourses,
+  updateCurrentUserCurrentLesson,
 } = require('../controllers/userController');
 const { getUserCourses } = require('../controllers/courseController');
 
@@ -38,6 +39,7 @@ router.route('/me/enroll').post(enrollCurrentUserToCourse);
 router.route('/me/assignAchievement').post(assignAchievementToCurrentUser);
 router.route('/me/completedLessons').post(updateCurrentUserCompletedLessons);
 router.route('/me/completedCourses').post(updateCurrentUserCompletedCourses);
+router.route('/me/currentLesson').post(updateCurrentUserCurrentLesson);
 router
   .route('/:userId')
   .get(getUser)

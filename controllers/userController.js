@@ -112,6 +112,23 @@ const updateCurrentUserCompletedLessons = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed lessons' });
 };
 
+const updateCurrentUserCurrentLesson = async (req, res) => {
+  const userId = req.user.userId;
+  const lessonId = req.body.lessonId;
+
+  const user = await Users.findById(userId);
+  if (!user) throw new CustomErrors.NotFoundError('User was not found');
+
+  const lesson = await Lesson.findById(lessonId);
+  if (!lesson) throw new CustomErrors.NotFoundError(`Lesson with ID: ${lessonId} was not found`);
+
+  user.currentLesson = lessonId;
+
+  await user.save();
+
+  res.status(StatusCodes.OK).json({ msg: 'Successfully updated current lesson' });
+};
+
 //Users
 const getAllUsers = async (req, res) => {
   const user = await Users.find({}).select('-password');
@@ -283,4 +300,5 @@ module.exports = {
   updateCurrentUserCompletedLessons,
   updateUserCompletedCourses,
   updateCurrentUserCompletedCourses,
+  updateCurrentUserCurrentLesson,
 };

@@ -3,6 +3,7 @@ const { StatusCodes } = require('http-status-codes');
 const Users = require('../models/User');
 const Achievement = require('../models/Achievement');
 const Course = require('../models/Course');
+const Lesson = require('../models/Lesson');
 const { merge } = require('lodash');
 
 //Current User
@@ -77,6 +78,22 @@ const assignAchievementToCurrentUser = async (req, res) => {
   await user.save();
 
   res.status(StatusCodes.OK).json({ msg: `Successfully assigned achievement (${achievement.name}) to user` });
+};
+
+const updateCurrentUserCompletedLessons = async (req, res) => {
+  const userId = req.user.userId;
+  const lessonId = req.body.lessonId;
+
+  const user = await Users.findById(userId);
+  if (!user) throw new CustomErrors.NotFoundError('User was not found');
+
+  const lesson = await Lesson.findById(lessonId);
+  if (!lesson) throw new CustomErrors.NotFoundError(`Lesson with ID: ${lessonId} was not found`);
+
+  user.completedLessons = merge(user.completedLessons, lessonId);
+  await user.save();
+
+  res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed lessons' });
 };
 
 //Users
@@ -159,6 +176,21 @@ const assignAchievementToUser = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: `Successfully assigned achievement (${achievement.name}) to user` });
 };
 
+const updateUserCompletedLessons = async (req, res) => {
+  const userId = req.params.userId;
+  const lessonId = req.body.lessonId;
+
+  const user = await Users.findById(userId);
+  if (!user) throw new CustomErrors.NotFoundError('User was not found');
+
+  const lesson = await Lesson.findById(lessonId);
+  if (!lesson) throw new CustomErrors.NotFoundError(`Lesson with ID: ${lessonId} was not found`);
+
+  user.completedLessons = merge(user.completedLessons, lessonId);
+  await user.save();
+
+  res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed lessons' });
+};
 //Profiles
 const getAllProfiles = async (req, res) => {
   const profiles = await Users.find({}).select('profile');
@@ -215,4 +247,6 @@ module.exports = {
   enrollCurrentUserToCourse,
   assignAchievementToUser,
   assignAchievementToCurrentUser,
+  updateUserCompletedLessons,
+  updateCurrentUserCompletedLessons,
 };

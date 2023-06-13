@@ -48,6 +48,20 @@ const deleteCurrentUser = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: 'User successfully deleted' });
 };
 
+const enrollCurrentUserToCourse = async (req, res) => {
+  const userId = req.user.userId;
+  const courseIds = req.body.courseIds;
+  const user = await Users.findById(userId);
+  if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
+  const courses = await Course.find({ _id: { $in: courseIds } });
+  if (!courses) throw new CustomErrors.NotFoundError('Invalid courseId(s)');
+
+  user.enrolledCourses = merge(user.enrolledCourses, courses);
+  await user.save();
+
+  res.status(StatusCodes.OK).json({ msg: 'Successfully enrolled to course' });
+};
+
 //Users
 const getAllUsers = async (req, res) => {
   const user = await Users.find({}).select('-password');
@@ -165,4 +179,5 @@ module.exports = {
   getProfile,
   updateProfile,
   enrollUserToCourse,
+  enrollCurrentUserToCourse,
 };

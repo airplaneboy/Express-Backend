@@ -17,6 +17,7 @@ const {
   getProfile,
   updateProfile,
   enrollUserToCourse,
+  enrollCurrentUserToCourse,
 } = require('../controllers/userController');
 const { getUserCourses } = require('../controllers/courseController');
 
@@ -27,7 +28,8 @@ router.route('/profiles').get(authorizePermissions('admin'), getAllProfiles);
 router.route('/me').get(getCurrentUser).patch(updateCurrentUser).delete(deleteCurrentUser);
 router.route('/me/password').patch(updateCurrentPassword);
 router.route('/me/profile').get(getCurrentProfile).patch(updateCurrentProfile);
-router.route('/enroll/:userId/').post(authorizePermissions('admin'), enrollUserToCourse);
+router.route('/me/enroll').post(enrollCurrentUserToCourse);
+router.route('/enroll/:userId').post(authorizePermissions('admin'), enrollUserToCourse);
 router
   .route('/:userId')
   .get(getUser)

@@ -16,8 +16,8 @@ const {
   updateCurrentProfile,
   getProfile,
   updateProfile,
-  enrollUserToCourse,
-  enrollCurrentUserToCourse,
+  updateUserCourses,
+  updateCurrentUserCourses,
   assignAchievementToCurrentUser,
   assignAchievementToUser,
   updateUserCompletedLessons,
@@ -35,21 +35,21 @@ router.route('/profiles').get(authorizePermissions('admin'), getAllProfiles);
 router.route('/me').get(getCurrentUser).patch(updateCurrentUser).delete(deleteCurrentUser);
 router.route('/me/password').patch(updateCurrentPassword);
 router.route('/me/profile').get(getCurrentProfile).patch(updateCurrentProfile);
-router.route('/me/enroll').post(enrollCurrentUserToCourse);
-router.route('/me/assignAchievement').post(assignAchievementToCurrentUser);
-router.route('/me/completedLessons').post(updateCurrentUserCompletedLessons);
-router.route('/me/completedCourses').post(updateCurrentUserCompletedCourses);
-router.route('/me/currentLesson').post(updateCurrentUserCurrentLesson);
+router.route('/me/courses').patch(updateCurrentUserCourses);
+router.route('/me/achievements').patch(assignAchievementToCurrentUser);
+router.route('/me/completedLessons').patch(updateCurrentUserCompletedLessons);
+router.route('/me/completedCourses').patch(updateCurrentUserCompletedCourses);
+router.route('/me/currentLesson').patch(updateCurrentUserCurrentLesson);
 router
   .route('/:userId')
   .get(getUser)
   .patch(authorizePermissions('admin'), updateUser)
   .delete(authorizePermissions('admin'), deleteUser);
-router.route('/:userId/assignAchievement', authorizePermissions('admin'), assignAchievementToUser);
+router.route('/:userId/achievements').patch(authorizePermissions('admin'), assignAchievementToUser);
 router.route('/:userId/courses').get(getUserCourses);
-router.route('/:userId/completedLessons').post(authorizePermissions('admin'), updateUserCompletedLessons);
-router.route('/:userId/completedCourses').post(authorizePermissions('admin'), updateUserCompletedCourses);
-router.route('/:userId/enroll').post(authorizePermissions('admin'), enrollUserToCourse);
+router.route('/:userId/completedLessons').patch(authorizePermissions('admin'), updateUserCompletedLessons);
+router.route('/:userId/completedCourses').patch(authorizePermissions('admin'), updateUserCompletedCourses);
+router.route('/:userId/courses').patch(authorizePermissions('admin'), updateUserCourses);
 router.route('/:userId/password').patch(authorizePermissions('admin'), updatePassword);
 router.route('/:userId/profile').get(getProfile).patch(authorizePermissions('admin'), updateProfile);
 

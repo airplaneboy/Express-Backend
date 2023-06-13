@@ -50,31 +50,47 @@ const deleteCurrentUser = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: 'User successfully deleted' });
 };
 
-const enrollCurrentUserToCourse = async (req, res) => {
+const updateCurrentUserCourses = async (req, res) => {
   const userId = req.user.userId;
+  // const courseId = req.body.courseId;
   const courseIds = req.body.courseIds;
+
   const user = await Users.findById(userId);
   if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
-  const courses = await Course.find({ _id: { $in: courseIds } });
-  if (!courses) throw new CustomErrors.NotFoundError('Invalid courseId(s)');
 
-  user.enrolledCourses = merge(user.enrolledCourses, courses);
+  const errors = [];
+  for (const courseId of courseIds) {
+    const course = await Course.findById(courseId).catch((err) => {
+      errors.push(err.message);
+    });
+
+    if (!course) {
+      continue;
+    }
+    if (user.enrolledCourses.includes(courseId)) {
+      continue;
+    }
+    console.log(course.title);
+    user.enrolledCourses.push(courseId);
+  }
   await user.save();
-
-  res.status(StatusCodes.OK).json({ msg: 'Successfully enrolled to course' });
+  return res.status(StatusCodes.OK).json({ msg: 'Successfully enrolled to course', errors });
 };
 
 const assignAchievementToCurrentUser = async (req, res) => {
-  const userId = req.user.Id;
+  const userId = req.user.userId;
   const achievementId = req.body.achievementId;
 
   const user = await Users.findById(userId);
   if (!user) throw new CustomErrors.NotFoundError(`User with ID: ${userId} not found`);
 
-  const achievement = Achievement.findById(achievementId);
+  const achievement = await Achievement.findById(achievementId);
   if (!achievement) throw new CustomErrors.NotFoundError(`Achievement with ID: ${achievementId} not found`);
 
-  user.achievements = merge(user.achievements, achievementId);
+  if (user.achievements.includes(achievementId))
+    return res.status(StatusCodes.OK).json({ msg: 'This user has already earned this achievement' });
+
+  user.achievements.push(achievementId);
   await user.save();
 
   res.status(StatusCodes.OK).json({ msg: `Successfully assigned achievement (${achievement.name}) to user` });
@@ -90,7 +106,10 @@ const updateCurrentUserCompletedCourses = async (req, res) => {
   const course = await Course.findById(courseId);
   if (!course) throw new CustomErrors.NotFoundError(`Lesson with ID: ${courseId} was not found`);
 
-  user.completedCourses = merge(user.completedCourses, courseId);
+  if (user.enrolledCourses.includes(courseId))
+    return res.status(StatusCodes.OK).json({ msg: 'This user has already completed this course' });
+
+  user.enrolledCourses.push(courseId);
   await user.save();
 
   res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed courses' });
@@ -106,7 +125,10 @@ const updateCurrentUserCompletedLessons = async (req, res) => {
   const lesson = await Lesson.findById(lessonId);
   if (!lesson) throw new CustomErrors.NotFoundError(`Lesson with ID: ${lessonId} was not found`);
 
-  user.completedLessons = merge(user.completedLessons, lessonId);
+  if (user.completedLessons.includes(lessonId))
+    return res.status(StatusCodes.OK).json({ msg: 'This lesson has been completed by the user' });
+
+  user.completedLessons.push(lessonId);
   await user.save();
 
   res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed lessons' });
@@ -176,34 +198,46 @@ const deleteUser = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: 'User successfully deleted' });
 };
 
-const enrollUserToCourse = async (req, res) => {
+const updateUserCourses = async (req, res) => {
   const userId = req.params.userId;
   const courseIds = req.body.courseIds;
 
   const user = await Users.findById(userId);
   if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
-  // const course = await Course.findById(courseId);
-  const courses = await Course.find({ _id: { $in: courseIds } });
-  if (!courses) throw new CustomErrors.NotFoundError('Invalid courseId(s)');
 
-  // user.enrolledCourses.push(...courseIds);
-  user.enrolledCourses = merge(user.enrolledCourses, courses);
+  const errors = [];
+  for (const courseId of courseIds) {
+    const course = await Course.findById(courseId).catch((err) => {
+      errors.push(err.message);
+    });
+
+    if (!course) {
+      continue;
+    }
+    if (user.enrolledCourses.includes(courseId)) {
+      continue;
+    }
+    console.log(course.title);
+    user.enrolledCourses.push(courseId);
+  }
   await user.save();
-
-  res.status(StatusCodes.OK).json({ msg: 'Successfully enrolled to course' });
+  return res.status(StatusCodes.OK).json({ msg: 'Successfully enrolled to course', errors });
 };
 
 const assignAchievementToUser = async (req, res) => {
-  const userId = req.params.Id;
+  const userId = req.params.userId;
   const achievementId = req.body.achievementId;
 
   const user = await Users.findById(userId);
   if (!user) throw new CustomErrors.NotFoundError(`User with ID: ${userId} not found`);
 
-  const achievement = Achievement.findById(achievementId);
+  const achievement = await Achievement.findById(achievementId);
   if (!achievement) throw new CustomErrors.NotFoundError(`Achievement with ID: ${achievementId} not found`);
 
-  user.achievements = merge(user.achievements, achievementId);
+  if (user.achievements.includes(achievementId))
+    return res.status(StatusCodes.OK).json({ msg: 'This user has already earned this achievement' });
+
+  user.achievements.push(achievementId);
   await user.save();
 
   res.status(StatusCodes.OK).json({ msg: `Successfully assigned achievement (${achievement.name}) to user` });
@@ -219,7 +253,10 @@ const updateUserCompletedLessons = async (req, res) => {
   const lesson = await Lesson.findById(lessonId);
   if (!lesson) throw new CustomErrors.NotFoundError(`Lesson with ID: ${lessonId} was not found`);
 
-  user.completedLessons = merge(user.completedLessons, lessonId);
+  if (user.completedLessons.includes(lessonId))
+    return res.status(StatusCodes.OK).json({ msg: 'This lesson has been completed by the user' });
+
+  user.completedLessons.push(lessonId);
   await user.save();
 
   res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed lessons' });
@@ -235,12 +272,16 @@ const updateUserCompletedCourses = async (req, res) => {
   const course = await Course.findById(courseId);
   if (!course) throw new CustomErrors.NotFoundError(`Lesson with ID: ${courseId} was not found`);
 
-  user.completedCourses = merge(user.completedCourses, courseId);
+  if (user.enrolledCourses.includes(courseId))
+    return res.status(StatusCodes.OK).json({ msg: 'This user has already completed this course' });
+
+  user.enrolledCourses.push(courseId);
   await user.save();
 
   res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed courses' });
 };
-//Profiles
+
+//#region Profiles
 const getAllProfiles = async (req, res) => {
   const profiles = await Users.find({}).select('profile');
   if (!profiles) throw new CustomErrors.BadRequestError('Unable to get users');
@@ -276,6 +317,7 @@ const updateProfile = async (req, res) => {
   await user.save();
   res.status(200).json({ user, body: req.body });
 };
+//#endregion
 
 module.exports = {
   getAllUsers,
@@ -292,8 +334,8 @@ module.exports = {
   getAllProfiles,
   getProfile,
   updateProfile,
-  enrollUserToCourse,
-  enrollCurrentUserToCourse,
+  updateUserCourses,
+  updateCurrentUserCourses,
   assignAchievementToUser,
   assignAchievementToCurrentUser,
   updateUserCompletedLessons,

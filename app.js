@@ -1,7 +1,7 @@
 //Packages
-require('express-async-errors');
 require('dotenv').config();
 const express = require('express');
+require('express-async-errors');
 const app = express();
 const cookieParser = require('cookie-parser');
 const start = require('./services/startFunction');
@@ -9,7 +9,6 @@ const session = require('express-session');
 const passport = require('passport');
 const configurePassport = require('./utils/passport-config');
 const { notFound, errorHandler } = require('./middlewares');
-
 //Import Routes
 const {
   authRouter,

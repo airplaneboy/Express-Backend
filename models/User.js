@@ -93,32 +93,33 @@ const UserSchema = new mongoose.Schema(
 
     achievements: { type: [mongoose.Schema.Types.ObjectId], ref: 'Achievement' },
 
-    comments: [
-      {
-        text: { type: String, required: true },
-        createdAt: { type: Date, default: Date.now },
-        lessonId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Lesson',
-          required: true,
-        },
-        // Add any other relevant fields like author, replies, etc.
-      },
-    ],
+    // comments: [
+    //   {
+    //     text: { type: String, required: true },
+    //     createdAt: { type: Date, default: Date.now },
+    //     lessonId: {
+    //       type: mongoose.Schema.Types.ObjectId,
+    //       ref: 'Lesson',
+    //       required: true,
+    //     },
+    //     // Add any other relevant fields like author, replies, etc.
+    //   },
+    // ],
 
-    notifications: [
-      {
-        type: { type: String, required: true },
-        text: { type: String, required: true },
-        createdAt: { type: Date, default: Date.now },
-        lessonId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Lesson',
-          required: true,
-        },
-        // other relevant fields like sender, link, etc.
-      },
-    ],
+    //TODO: Should I get rid of this?
+    // notifications: [
+    //   {
+    //     type: { type: String, required: true },
+    //     text: { type: String, required: true },
+    //     createdAt: { type: Date, default: Date.now },
+    //     lessonId: {
+    //       type: mongoose.Schema.Types.ObjectId,
+    //       ref: 'Lesson',
+    //       required: true,
+    //     },
+    //     // other relevant fields like sender, link, etc.
+    //   },
+    // ],
   },
   { timestamps: true }
 );

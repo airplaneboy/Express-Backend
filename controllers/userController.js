@@ -6,7 +6,7 @@ const Course = require('../models/Course');
 const Lesson = require('../models/Lesson');
 const { merge } = require('lodash');
 
-//Current User
+//#region Current User
 const getCurrentUser = async (req, res) => {
   if (!req.user) throw new CustomErrors.BadRequestError('Login is required');
   const userId = req.user.userId;
@@ -194,8 +194,9 @@ const deleteCurrentUserCourses = async (req, res) => {
   await user.save();
   return res.status(StatusCodes.OK).json({ msg: 'Successfully removed user from course(s)', errors });
 };
+//#endregion
 
-//Users
+//#region Users
 const getAllUsers = async (req, res) => {
   const user = await Users.find({}).select('-password');
   if (!user) throw new CustomErrors.BadRequestError('Unable to get users');
@@ -262,10 +263,8 @@ const updateUserCourses = async (req, res) => {
     }
     if (user.enrolledCourses.includes(courseId)) {
       errors.push(`msg: User is already enrolled to course with ID: ${courseId} (${course.title})`);
-
       continue;
     }
-    console.log(course.title);
     user.enrolledCourses.push(courseId);
   }
   await user.save();
@@ -357,6 +356,37 @@ const updateUserCurrentLesson = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: 'Successfully updated current lesson' });
 };
 
+const deleteUserCourses = async (req, res) => {
+  const userId = req.params.userId;
+  const courseIds = req.body.courseIds;
+
+  const user = await Users.findById(userId);
+  if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
+
+  if (!Array.isArray(courseIds)) throw new CustomErrors.BadRequestError('courseIds takes an array');
+
+  const errors = [];
+  for (const courseId of courseIds) {
+    const course = await Course.findById(courseId).catch((err) => {
+      errors.push(err.message);
+    });
+
+    if (!course) {
+      continue;
+    }
+
+    if (!user.enrolledCourses.includes(courseId)) {
+      errors.push(`msg: User is not enrolled to course with ID: ${courseId} (${course.title})`);
+      continue;
+    }
+
+    user.enrolledCourses.pull(courseId);
+  }
+  await user.save();
+  return res.status(StatusCodes.OK).json({ msg: 'Successfully removed user from course(s)', errors });
+};
+//#endregion
+
 //#region Profiles
 const getAllProfiles = async (req, res) => {
   const profiles = await Users.find({}).select('profile');
@@ -421,4 +451,5 @@ module.exports = {
   updateCurrentUserCurrentLesson,
   updateUserCurrentLesson,
   deleteCurrentUserCourses,
+  deleteUserCourses,
 };

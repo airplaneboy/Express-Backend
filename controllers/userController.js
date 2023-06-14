@@ -302,6 +302,28 @@ const updateUserCompletedCourses = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed courses' });
 };
 
+const updateUserCurrentLesson = async (req, res) => {
+  const userId = req.params.userId;
+  const lessonId = req.body.lessonId;
+
+  const user = await Users.findById(userId);
+  if (!user) throw new CustomErrors.NotFoundError('User was not found');
+
+  const lesson = await Lesson.findById(lessonId);
+  if (!lesson) throw new CustomErrors.NotFoundError(`Lesson with ID: ${lessonId} was not found`);
+
+  if (Array.isArray(lessonId)) throw new CustomErrors.BadRequestError('lessonId cannot be an array');
+
+  if (user.currentLesson == lessonId)
+    throw new CustomErrors.BadRequestError('User is currently working on this lesson');
+
+  user.currentLesson = lessonId;
+
+  await user.save();
+
+  res.status(StatusCodes.OK).json({ msg: 'Successfully updated current lesson' });
+};
+
 //#region Profiles
 const getAllProfiles = async (req, res) => {
   const profiles = await Users.find({}).select('profile');
@@ -364,4 +386,5 @@ module.exports = {
   updateUserCompletedCourses,
   updateCurrentUserCompletedCourses,
   updateCurrentUserCurrentLesson,
+  updateUserCurrentLesson,
 };

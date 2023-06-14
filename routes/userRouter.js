@@ -25,6 +25,7 @@ const {
   updateUserCompletedCourses,
   updateCurrentUserCompletedCourses,
   updateCurrentUserCurrentLesson,
+  updateUserCurrentLesson,
 } = require('../controllers/userController');
 const { getUserCourses } = require('../controllers/courseController');
 
@@ -50,6 +51,7 @@ router.route('/:userId/courses').get(getUserCourses);
 router.route('/:userId/completedLessons').patch(authorizePermissions('admin'), updateUserCompletedLessons);
 router.route('/:userId/completedCourses').patch(authorizePermissions('admin'), updateUserCompletedCourses);
 router.route('/:userId/courses').patch(authorizePermissions('admin'), updateUserCourses);
+router.route('/:userId/currentLesson').put(authorizePermissions('admin'), updateUserCurrentLesson);
 router.route('/:userId/password').patch(authorizePermissions('admin'), updatePassword);
 router.route('/:userId/profile').get(getProfile).patch(authorizePermissions('admin'), updateProfile);
 

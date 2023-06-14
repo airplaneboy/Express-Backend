@@ -58,6 +58,8 @@ const updateCurrentUserCourses = async (req, res) => {
   const user = await Users.findById(userId);
   if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
 
+  if (!Array.isArray(courseIds)) throw new CustomErrors.BadRequestError('courseIds takes an array');
+
   const errors = [];
   for (const courseId of courseIds) {
     const course = await Course.findById(courseId).catch((err) => {
@@ -90,7 +92,7 @@ const assignAchievementToCurrentUser = async (req, res) => {
   if (Array.isArray(achievementId)) throw new CustomErrors.BadRequestError('achievementId cannot be an array');
 
   if (user.achievements.includes(achievementId))
-    return res.status(StatusCodes.OK).json({ msg: 'This user has already earned this achievement' });
+    throw new CustomErrors.BadRequestError('This user has already earned this achievement');
 
   user.achievements.push(achievementId);
   await user.save();
@@ -108,8 +110,10 @@ const updateCurrentUserCompletedLessons = async (req, res) => {
   const lesson = await Lesson.findById(lessonId);
   if (!lesson) throw new CustomErrors.NotFoundError(`Lesson with ID: ${lessonId} was not found`);
 
+  if (Array.isArray(lessonId)) throw new CustomErrors.BadRequestError('lessonId cannot be an array');
+
   if (user.completedLessons.includes(lessonId))
-    return res.status(StatusCodes.OK).json({ msg: 'This lesson has been completed by the user' });
+    throw new CustomErrors.BadRequestError('This lesson has been completed by the user');
 
   user.completedLessons.push(lessonId);
   await user.save();
@@ -127,8 +131,10 @@ const updateCurrentUserCompletedCourses = async (req, res) => {
   const course = await Course.findById(courseId);
   if (!course) throw new CustomErrors.NotFoundError(`Lesson with ID: ${courseId} was not found`);
 
+  if (Array.isArray(courseId)) throw new CustomErrors.BadRequestError('courseId cannot be an array');
+
   if (user.enrolledCourses.includes(courseId))
-    return res.status(StatusCodes.OK).json({ msg: 'This user has already completed this course' });
+    throw new CustomErrors.BadRequestError('This user has already completed this course');
 
   user.enrolledCourses.push(courseId);
   await user.save();
@@ -238,11 +244,10 @@ const assignAchievementToUser = async (req, res) => {
   const achievement = await Achievement.findById(achievementId);
   if (!achievement) throw new CustomErrors.NotFoundError(`Achievement with ID: ${achievementId} not found`);
 
-  if (Array.isArray(achievementId))
-    return res.status(StatusCodes.BAD_REQUEST).json({ msg: 'achievementId cannot be an array' });
+  if (Array.isArray(achievementId)) throw new CustomErrors.BadRequestError('achievementId cannot be an array');
 
   if (user.achievements.includes(achievementId))
-    return res.status(StatusCodes.OK).json({ msg: 'This user has already earned this achievement' });
+    throw new CustomErrors.BadRequestError('This user has already earned this achievement');
 
   user.achievements.push(achievementId);
   await user.save();
@@ -260,8 +265,10 @@ const updateUserCompletedLessons = async (req, res) => {
   const lesson = await Lesson.findById(lessonId);
   if (!lesson) throw new CustomErrors.NotFoundError(`Lesson with ID: ${lessonId} was not found`);
 
+  if (Array.isArray(lessonId)) throw new CustomErrors.BadRequestError('lessonId cannot be an array');
+
   if (user.completedLessons.includes(lessonId))
-    return res.status(StatusCodes.OK).json({ msg: 'This lesson has been completed by the user' });
+    throw new CustomErrors.BadRequestError('This lesson has been completed by the user');
 
   user.completedLessons.push(lessonId);
   await user.save();
@@ -279,8 +286,10 @@ const updateUserCompletedCourses = async (req, res) => {
   const course = await Course.findById(courseId);
   if (!course) throw new CustomErrors.NotFoundError(`Lesson with ID: ${courseId} was not found`);
 
+  if (Array.isArray(courseId)) throw new CustomErrors.BadRequestError('courseId cannot be an array');
+
   if (user.enrolledCourses.includes(courseId))
-    return res.status(StatusCodes.OK).json({ msg: 'This user has already completed this course' });
+    throw new CustomErrors.BadRequestError('This user has already completed this course');
 
   user.enrolledCourses.push(courseId);
   await user.save();

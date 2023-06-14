@@ -129,14 +129,14 @@ const updateCurrentUserCompletedCourses = async (req, res) => {
   if (!user) throw new CustomErrors.NotFoundError('User was not found');
 
   const course = await Course.findById(courseId);
-  if (!course) throw new CustomErrors.NotFoundError(`Lesson with ID: ${courseId} was not found`);
+  if (!course) throw new CustomErrors.NotFoundError(`Course with ID: ${courseId} was not found`);
 
   if (Array.isArray(courseId)) throw new CustomErrors.BadRequestError('courseId cannot be an array');
 
-  if (user.enrolledCourses.includes(courseId))
+  if (user.completedCourses.includes(courseId))
     throw new CustomErrors.BadRequestError('This user has already completed this course');
 
-  user.enrolledCourses.push(courseId);
+  user.completedCourses.push(courseId);
   await user.save();
 
   res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed courses' });
@@ -284,14 +284,14 @@ const updateUserCompletedCourses = async (req, res) => {
   if (!user) throw new CustomErrors.NotFoundError('User was not found');
 
   const course = await Course.findById(courseId);
-  if (!course) throw new CustomErrors.NotFoundError(`Lesson with ID: ${courseId} was not found`);
+  if (!course) throw new CustomErrors.NotFoundError(`Course with ID: ${courseId} was not found`);
 
   if (Array.isArray(courseId)) throw new CustomErrors.BadRequestError('courseId cannot be an array');
 
-  if (user.enrolledCourses.includes(courseId))
+  if (user.completedCourses.includes(courseId))
     throw new CustomErrors.BadRequestError('This user has already completed this course');
 
-  user.enrolledCourses.push(courseId);
+  user.completedCourses.push(courseId);
   await user.save();
 
   res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed courses' });

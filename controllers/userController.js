@@ -152,6 +152,11 @@ const updateCurrentUserCurrentLesson = async (req, res) => {
   const lesson = await Lesson.findById(lessonId);
   if (!lesson) throw new CustomErrors.NotFoundError(`Lesson with ID: ${lessonId} was not found`);
 
+  if (Array.isArray(lessonId)) throw new CustomErrors.BadRequestError('lessonId cannot be an array');
+
+  if (user.currentLesson == lessonId)
+    throw new CustomErrors.BadRequestError('User is currently working on this lesson');
+
   user.currentLesson = lessonId;
 
   await user.save();

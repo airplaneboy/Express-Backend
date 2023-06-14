@@ -39,7 +39,7 @@ router.route('/me/courses').patch(updateCurrentUserCourses);
 router.route('/me/achievements').patch(assignAchievementToCurrentUser);
 router.route('/me/completedLessons').patch(updateCurrentUserCompletedLessons);
 router.route('/me/completedCourses').patch(updateCurrentUserCompletedCourses);
-router.route('/me/currentLesson').patch(updateCurrentUserCurrentLesson);
+router.route('/me/currentLesson').put(updateCurrentUserCurrentLesson);
 router
   .route('/:userId')
   .get(getUser)

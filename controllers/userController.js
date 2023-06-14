@@ -87,6 +87,8 @@ const assignAchievementToCurrentUser = async (req, res) => {
   const achievement = await Achievement.findById(achievementId);
   if (!achievement) throw new CustomErrors.NotFoundError(`Achievement with ID: ${achievementId} not found`);
 
+  if (Array.isArray(achievementId)) throw new CustomErrors.BadRequestError('achievementId cannot be an array');
+
   if (user.achievements.includes(achievementId))
     return res.status(StatusCodes.OK).json({ msg: 'This user has already earned this achievement' });
 
@@ -94,25 +96,6 @@ const assignAchievementToCurrentUser = async (req, res) => {
   await user.save();
 
   res.status(StatusCodes.OK).json({ msg: `Successfully assigned achievement (${achievement.name}) to user` });
-};
-
-const updateCurrentUserCompletedCourses = async (req, res) => {
-  const userId = req.user.userId;
-  const courseId = req.body.courseId;
-
-  const user = await Users.findById(userId);
-  if (!user) throw new CustomErrors.NotFoundError('User was not found');
-
-  const course = await Course.findById(courseId);
-  if (!course) throw new CustomErrors.NotFoundError(`Lesson with ID: ${courseId} was not found`);
-
-  if (user.enrolledCourses.includes(courseId))
-    return res.status(StatusCodes.OK).json({ msg: 'This user has already completed this course' });
-
-  user.enrolledCourses.push(courseId);
-  await user.save();
-
-  res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed courses' });
 };
 
 const updateCurrentUserCompletedLessons = async (req, res) => {
@@ -132,6 +115,25 @@ const updateCurrentUserCompletedLessons = async (req, res) => {
   await user.save();
 
   res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed lessons' });
+};
+
+const updateCurrentUserCompletedCourses = async (req, res) => {
+  const userId = req.user.userId;
+  const courseId = req.body.courseId;
+
+  const user = await Users.findById(userId);
+  if (!user) throw new CustomErrors.NotFoundError('User was not found');
+
+  const course = await Course.findById(courseId);
+  if (!course) throw new CustomErrors.NotFoundError(`Lesson with ID: ${courseId} was not found`);
+
+  if (user.enrolledCourses.includes(courseId))
+    return res.status(StatusCodes.OK).json({ msg: 'This user has already completed this course' });
+
+  user.enrolledCourses.push(courseId);
+  await user.save();
+
+  res.status(StatusCodes.OK).json({ msg: 'Successfully updated completed courses' });
 };
 
 const updateCurrentUserCurrentLesson = async (req, res) => {
@@ -205,6 +207,8 @@ const updateUserCourses = async (req, res) => {
   const user = await Users.findById(userId);
   if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
 
+  if (!Array.isArray(courseIds)) throw new CustomErrors.BadRequestError('courseIds takes an array');
+
   const errors = [];
   for (const courseId of courseIds) {
     const course = await Course.findById(courseId).catch((err) => {
@@ -233,6 +237,9 @@ const assignAchievementToUser = async (req, res) => {
 
   const achievement = await Achievement.findById(achievementId);
   if (!achievement) throw new CustomErrors.NotFoundError(`Achievement with ID: ${achievementId} not found`);
+
+  if (Array.isArray(achievementId))
+    return res.status(StatusCodes.BAD_REQUEST).json({ msg: 'achievementId cannot be an array' });
 
   if (user.achievements.includes(achievementId))
     return res.status(StatusCodes.OK).json({ msg: 'This user has already earned this achievement' });

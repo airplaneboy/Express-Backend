@@ -70,9 +70,10 @@ const updateCurrentUserCourses = async (req, res) => {
       continue;
     }
     if (user.enrolledCourses.includes(courseId)) {
+      errors.push(`msg: User is already enrolled to course with ID: ${courseId} (${course.title})`);
+
       continue;
     }
-    console.log(course.title);
     user.enrolledCourses.push(courseId);
   }
   await user.save();
@@ -164,6 +165,36 @@ const updateCurrentUserCurrentLesson = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: 'Successfully updated current lesson' });
 };
 
+const deleteCurrentUserCourses = async (req, res) => {
+  const userId = req.user.userId;
+  const courseIds = req.body.courseIds;
+
+  const user = await Users.findById(userId);
+  if (!user) throw new CustomErrors.NotFoundError('This user does not exist');
+
+  if (!Array.isArray(courseIds)) throw new CustomErrors.BadRequestError('courseIds takes an array');
+
+  const errors = [];
+  for (const courseId of courseIds) {
+    const course = await Course.findById(courseId).catch((err) => {
+      errors.push(err.message);
+    });
+
+    if (!course) {
+      continue;
+    }
+
+    if (!user.enrolledCourses.includes(courseId)) {
+      errors.push(`msg: User is not enrolled to course with ID: ${courseId} (${course.title})`);
+      continue;
+    }
+
+    user.enrolledCourses.pull(courseId);
+  }
+  await user.save();
+  return res.status(StatusCodes.OK).json({ msg: 'Successfully removed user from course(s)', errors });
+};
+
 //Users
 const getAllUsers = async (req, res) => {
   const user = await Users.find({}).select('-password');
@@ -230,6 +261,8 @@ const updateUserCourses = async (req, res) => {
       continue;
     }
     if (user.enrolledCourses.includes(courseId)) {
+      errors.push(`msg: User is already enrolled to course with ID: ${courseId} (${course.title})`);
+
       continue;
     }
     console.log(course.title);
@@ -387,4 +420,5 @@ module.exports = {
   updateCurrentUserCompletedCourses,
   updateCurrentUserCurrentLesson,
   updateUserCurrentLesson,
+  deleteCurrentUserCourses,
 };

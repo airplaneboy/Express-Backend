@@ -26,6 +26,7 @@ const {
   updateCurrentUserCompletedCourses,
   updateCurrentUserCurrentLesson,
   updateUserCurrentLesson,
+  deleteCurrentUserCourses,
 } = require('../controllers/userController');
 const { getUserCourses } = require('../controllers/courseController');
 
@@ -36,7 +37,7 @@ router.route('/profiles').get(authorizePermissions('admin'), getAllProfiles);
 router.route('/me').get(getCurrentUser).patch(updateCurrentUser).delete(deleteCurrentUser);
 router.route('/me/password').patch(updateCurrentPassword);
 router.route('/me/profile').get(getCurrentProfile).patch(updateCurrentProfile);
-router.route('/me/courses').patch(updateCurrentUserCourses);
+router.route('/me/courses').patch(updateCurrentUserCourses).delete(deleteCurrentUserCourses);
 router.route('/me/achievements').patch(assignAchievementToCurrentUser);
 router.route('/me/completedLessons').patch(updateCurrentUserCompletedLessons);
 router.route('/me/completedCourses').patch(updateCurrentUserCompletedCourses);

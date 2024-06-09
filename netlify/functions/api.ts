@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/hello', (req, res) => res.send('Hello World!'));
 router.get('/', (req, res) => res.send('Welcome!'));
 
-app.use('/api/', router);
+app.use('/', router);
 
 const start = async () => {
   try {

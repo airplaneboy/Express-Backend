@@ -33,7 +33,6 @@ const UserSchema = new mongoose.Schema(
       //TODO: comment out before prod
       // validate: {
       //   validator: (value) => {
-      //     console.log(value);
       //     const options = {
       //       minLength: 6,
       //       minLowercase: 1,

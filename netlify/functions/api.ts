@@ -2,19 +2,12 @@
 
 import express, { Router } from 'express';
 import serverless from 'serverless-http';
-
+import { app } from '../../app';
 const api = express();
 
 const router = Router();
-router.get('/hello', (req, res) => {
-  console.log('...hit the hello route');
-  return res.send('Hello World!');
-});
-router.get('/', (req, res) => {
-  console.log('...hit the home route');
-  return res.json({ home: 'Home Rocks!' });
-});
+router.get('/hello', (req, res) => res.send('Hello World!'));
 
-api.use('/api/', router);
+app.use('/api/', router);
 
-export const handler = serverless(api);
+export const handler = serverless(app);

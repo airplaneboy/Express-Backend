@@ -54,3 +54,5 @@ app.use(notFound);
 app.use(errorHandler);
 
 start(app);
+
+module.exports = { app };

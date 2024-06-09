@@ -21,6 +21,10 @@ const {
 } = require('./routes/routes');
 
 //Use Middlewares
+app.use(
+  '/',
+  express.Router().get('/', (req, res) => res.send('Welcome!'))
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.ACCESS_TOKEN_SECRET));

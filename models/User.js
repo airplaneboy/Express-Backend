@@ -43,7 +43,11 @@ const UserSchema = new mongoose.Schema(
 
           return validator.isStrongPassword(value, options);
         },
-        message: `Password ${this.password} does not meet the strength requirements. Minimum of 6 characters with at least one lowercase and 1 number`,
+        message: `Password ${this.password} ${JSON.stringify(
+          this,
+          null,
+          2
+        )} ${this} does not meet the strength requirements. Minimum of 6 characters with at least one lowercase and 1 number`,
       },
     },
     profile: {

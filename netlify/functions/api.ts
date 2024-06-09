@@ -4,7 +4,6 @@ const express = require('express');
 const serverless = require('serverless-http');
 const app = require('../../app');
 const connectDB = require('../../database/connectDB');
-const api = express();
 
 const router = express.Router();
 router.get('/hello', (req, res) => res.send('Hello World!'));

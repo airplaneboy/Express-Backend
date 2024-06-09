@@ -6,8 +6,6 @@ const app = require('../../app');
 const connectDB = require('../../database/connectDB');
 
 const router = express.Router();
-router.get('/hello', (req, res) => res.send('Hello World!'));
-router.get('/', (req, res) => res.send('Welcome! 2'));
 
 app.use('/', router);
 

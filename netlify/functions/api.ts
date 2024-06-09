@@ -1,15 +1,23 @@
 // YOUR_BASE_DIRECTORY/netlify/functions/api.ts
 
-import express, { Router } from 'express';
-import serverless from 'serverless-http';
-import { app } from '../../app';
+const express = require('express');
+const serverless = require('serverless-http');
+const app = require('../../app');
 const connectDB = require('../../database/connectDB');
 const api = express();
 
-const router = Router();
+const router = express.Router();
 router.get('/hello', (req, res) => res.send('Hello World!'));
+router.get('/', (req, res) => res.send('Welcome!'));
 
 app.use('/api/', router);
 
-await connectDB(process.env.MONGO_URI);
+const start = async () => {
+  try {
+    await connectDB(process.env.MONGO_URI);
+  } catch (error) {
+    console.log(error);
+  }
+};
+start();
 export const handler = serverless(app);

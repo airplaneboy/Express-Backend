@@ -55,4 +55,4 @@ app.use(errorHandler);
 
 start(app);
 
-module.exports = { app };
+module.exports = app;

@@ -31,21 +31,21 @@ const UserSchema = new mongoose.Schema(
       maxlength: 300,
       trim: true,
       //TODO: comment out before prod
-      validate: {
-        validator: (value) => {
-          console.log(value);
-          const options = {
-            minLength: 6,
-            minLowercase: 1,
-            // minUppercase: 1,
-            minNumbers: 1,
-            // minSymbols: 1,
-          };
+      // validate: {
+      //   validator: (value) => {
+      //     console.log(value);
+      //     const options = {
+      //       minLength: 6,
+      //       minLowercase: 1,
+      //       // minUppercase: 1,
+      //       minNumbers: 1,
+      //       // minSymbols: 1,
+      //     };
 
-          return validator.isStrongPassword(value, options);
-        },
-        message: `Password does not meet the strength requirements. Minimum of 6 characters with at least one lowercase and 1 number`,
-      },
+      //     return validator.isStrongPassword(value, options);
+      //   },
+      //   message: `Password does not meet the strength requirements. Minimum of 6 characters with at least one lowercase and 1 number`,
+      // },
     },
     profile: {
       firstName: { type: String, trim: true },
